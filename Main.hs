@@ -7,7 +7,7 @@ import Patterns
 import Control.Monad.Trans.Except
 
 main = do
-  procesa
+  process
 
 process :: IO ()
 process = do

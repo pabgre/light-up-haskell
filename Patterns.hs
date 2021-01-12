@@ -1,7 +1,7 @@
 module Patterns
       (pattern_I,
       pattern_II,
-      resolve
+      solve
       )where
 
 import BoardUtils
