@@ -50,3 +50,6 @@ In order to understand the solution or if you want to make your own boards, here
 | **2** | Wall near 2 | 2️⃣|
 | **3** | Wall near 3 | 3️⃣|
 | **4** | Wall near 4 |4️⃣|
+
+
+made by [@pabgre](https://github.com/pabgre/light-up-haskell)
