@@ -4,6 +4,9 @@ module Patterns
       solve
       )where
 
+---This module is meant to solve a board applying different patterns
+-----------------------------------------------------
+
 import BoardUtils
 import BoardInteraction
 

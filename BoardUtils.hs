@@ -11,6 +11,8 @@ module BoardUtils
         ) where
 
 
+--- This Module define the Board and Cell classes and basic interactions with them.
+
 data Cell = Empty Bool | Light | Lighted | LError | Black | Black0 | Black1 | Black2 | Black3 | Black4
   deriving(Eq, Show, Read)
 

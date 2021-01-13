@@ -1,5 +1,6 @@
 module BoardInteraction
     (place_bulb,
+    place_bulb_player,
     is_empty,
     is_black,
     is_lighted,
@@ -12,8 +13,14 @@ module BoardInteraction
     get_source_available
     ) where
 
+---This module allows interaction with the type Board
+
+-----------------------------------------------------
+
 import BoardUtils
 
+
+-- Functions that modify a specific cell
 place_forbidden :: Int -> Int -> Board -> Board
 place_forbidden x y board
        |((is_in_range x y board) && (is_empty x y board)) = change_elem x y (Empty False) board
@@ -25,10 +32,20 @@ place_bulb x y board
       | otherwise = board
       where e = get_elem x y board
 
+place_bulb_player :: Int -> Int -> Board -> Board
+place_bulb_player x y board
+      |((is_in_range x y board) && (e == Empty True)) = (light_at x y (change_elem x y Light board))
+      |((is_in_range x y board) && (e == Lighted)) = (light_at x y (change_elem x y LError board))
+      | otherwise = board
+      where e = get_elem x y board
+
+
+--This functions perform the light rays across the board when a ligh bulb is placed
 light_at :: Int -> Int -> Board -> Board
 light_at x y board
-      |((get_elem x y board) == Light) = light_north x y (light_east x y (light_west x y (light_south x y board)))
+      |(e == Light) || (e == LError) = light_north x y (light_east x y (light_west x y (light_south x y board)))
       |otherwise = board
+      where e = (get_elem x y board)
 
 light_north :: Int -> Int -> Board -> Board
 light_north x y board = light_generic x y (-1+) (0+) board
@@ -51,6 +68,8 @@ light_generic' x y fx fy board
       |otherwise = board
       where e = get_elem x y board
 
+
+--- This functions give information about specific Cell of the grid
 is_empty :: Int -> Int -> Board -> Bool
 is_empty x y board = (is_in_range x y board) && (e == (Empty True) || e == (Empty False))
   where e = get_elem x y board
@@ -80,7 +99,6 @@ get_need x y board
   where e = get_elem x y board
         bulbs = get_bulb_arround x y board
 
-
 get_source_generic :: Int -> Int -> (Int -> Int) -> (Int -> Int) -> Board -> [(Int, Int)]
 get_source_generic x y fx fy board = get_source_generic' (fx x) (fy y) fx fy board
 
@@ -106,8 +124,8 @@ get_source_available :: Int -> Int -> Board -> [(Int, Int)]
 get_source_available x y board = (get_source_north x y board) ++ (get_source_east x y board) ++ (get_source_west x y board) ++ (get_source_south x y board)
 
 
-count_true :: [Bool] -> Int
-count_true xs = foldl (flip ((+) . fromEnum)) 0 xs
+--- With this functions the info is gathered from a Cell surroundings.
+--- The above, left, right and inferior Cell will be checked.
 
 get_info_arround :: Int -> Int-> (Int-> Int-> Board -> Bool) -> Board -> Int
 get_info_arround x y f board = count_true ((f (x + 1) y board):(f (x - 1) y board):(f x (y + 1) board):(f x (y - 1) board):[])
@@ -118,8 +136,18 @@ get_space_arround x y board = get_info_arround x y (is_available) board
 get_bulb_arround :: Int -> Int -> Board -> Int
 get_bulb_arround x y board = get_info_arround x y (is_bulb) board
 
+
+--- With this you can place elements in the surrouings cells
+place_arround :: Int -> Int -> (Int -> Int -> Board -> Board) -> Board -> Board
+place_arround x y f board = f (x + 1) y (f (x - 1) y (f x (y - 1) (f x (y + 1) board)))
+
 place_forbidden_arround :: Int -> Int -> Board -> Board
-place_forbidden_arround x y board = place_forbidden (x + 1) y (place_forbidden (x - 1) y (place_forbidden x (y - 1) (place_forbidden x (y + 1) board)))
+place_forbidden_arround x y board = place_arround x y place_forbidden board
 
 place_bulb_arround :: Int -> Int -> Board -> Board
-place_bulb_arround x y board = place_bulb (x + 1) y (place_bulb (x - 1) y (place_bulb x (y - 1) (place_bulb x (y + 1) board)))
+place_bulb_arround x y board = place_arround x y place_bulb board
+
+
+---Extra functions needed
+count_true :: [Bool] -> Int
+count_true xs = foldl (flip ((+) . fromEnum)) 0 xs
